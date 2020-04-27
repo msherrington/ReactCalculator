@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Button} from "reactstrap"
+import {Button} from "reactstrap";
 
 function getValue(number, inputString) {
     return parseInt(number.toString() + inputString);
@@ -19,87 +19,85 @@ class Calculate extends Component {
         };
 
         // This binding is necessary to make `this` work in the callback
-        this.numberClick = this.numberClick.bind(this);
-        this.operatorClick = this.operatorClick.bind(this);
-        this.clearClick = this.clearClick.bind(this);
-        this.equalsClick = this.equalsClick.bind(this);
+        // this.numberClick = this.numberClick.bind(this);
+        // this.operatorClick = this.operatorClick.bind(this);
+        // this.clearClick = this.clearClick.bind(this);
+        // this.equalsClick = this.equalsClick.bind(this);
     }
 
-    numberClick(event) {
-        let inputString = event.target.innerText;
-        let value = this.state.first;
+    numberClick = ({ target: { innerText } }) => {
+        let { first, second, operator, calculated } = this.state;
         let newValue;
-        if (!this.state.operator) {
-            if (this.state.calculated) {
-                value = 0;
-            } else if (this.state.first.toString().length > 8) {
-                inputString = "";
+        if (!operator) {
+            if (calculated) {
+                newValue = getValue(0, innerText);
+            } else {
+                innerText = first.toString().length > 8 ? "" : innerText;
+                newValue = getValue(first, innerText);
             }
-            newValue = getValue(value, inputString);
-            this.setState(state => ({
+            this.setState({
                 first: newValue,
                 display: newValue,
                 calculated: false
-            }));
+            });
         } else {
-            value = this.state.second;
-            if (value.toString().length < 8) {
-                newValue = getValue(value, inputString);
-                this.setState(state => ({
+            if (second.toString().length < 8) {
+                newValue = getValue(second, innerText);
+                this.setState({
                     second: newValue,
                     display: newValue
-                }));
+                });
             }
         }
-    }
+    };
 
-    operatorClick(event) {
-        let newOperator = event.target.innerText;
-        this.setState(state => ({
-            operator: newOperator,
-            display: newOperator
-        }));
-    }
+    operatorClick = ({ target: { innerText } }) => {
+        this.setState({
+            operator: innerText,
+            display: innerText
+        });
+    };
 
-    clearClick(e) {
-        this.setState(state => ({
+    clearClick = () => {
+        this.setState({
             display: 0,
             operator: null,
             first: 0,
             second: 0
-        }));
-    }
+        });
+    };
 
-    equalsClick(e) {
+    equalsClick = () => {
+        let { first, second, operator } = this.state;
         let total;
-        switch (this.state.operator) {
+        switch (operator) {
             case "+":
-                total = this.state.first + this.state.second;
+                total = first + second;
                 break;
             case "-":
-                total = this.state.first - this.state.second;
+                total = first - second;
                 break;
             case "*":
-                total = this.state.first * this.state.second;
+                total = first * second;
                 break;
             case "/":
-                total = this.state.first / this.state.second;
+                total = first / second;
                 break;
             default:
-                total = this.state.first;
+                total = first;
                 break;
         }
         if (total % 1 !== 0 && total.toString().length > 8) {
             total = total.toPrecision(8);
         }
-        this.setState(state => ({
+        this.setState({
             display: total,
             operator: null,
             first: total,
             second: 0,
             calculated: true
-        }));
-    }
+        });
+    };
 
     render() {
         return (
@@ -125,8 +123,8 @@ class Calculate extends Component {
                 </div>
                 <div>
                     <Button onClick={e => this.numberClick(e)}>0</Button>
-                    <Button onClick={e => this.clearClick(e)}>CLR</Button>
-                    <Button onClick={e => this.equalsClick(e)}>=</Button>
+                    <Button onClick={this.clearClick}>CLR</Button>
+                    <Button onClick={this.equalsClick}>=</Button>
                     <Button onClick={e => this.operatorClick(e)}>/</Button>
                 </div>
             </div>
